@@ -1,0 +1,17 @@
+{
+  "name": "doorlock_system",
+  "version": "1.0.0",
+  "description": "Locks and unlockes the doors of the hacker space storage cabinet",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.4",
+    "onoff": "^1.1.0",
+    "pi-blaster.js": "sarfata/pi-blaster.js",
+    "serialport": "^3.1.2-beta1"
+  }
+}
