@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "doorlock-models": "oanylund/doorlock-models",
-    "express": "^4.13.4",
     "onoff": "^1.1.0",
     "pi-blaster.js": "sarfata/pi-blaster.js",
     "rc522-rfid": "sebastianpozoga/rc522-rfid"
