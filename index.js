@@ -48,15 +48,6 @@ User.sync().then(function() {
 
 process.on('SIGINT', function () {
   console.log('\nService stopped by user. Bye');
-
   // Release GPIO pins used by onoff
   MainLock.release();
-
-  if( rfid.isOpen() ) {
-    // Close serialport if open before closing
-    rfid.close((err) => {
-      if(err) console.log(err);
-      process.exit();
-    });
-  }
 });
