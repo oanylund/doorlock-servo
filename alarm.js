@@ -6,6 +6,7 @@ function Alarm(pinUsed) {
 
   this.lowTone = 0.5;
   this.highTone = 1;
+  this.errorTone = 0.2;
 }
 
 Alarm.prototype = {
@@ -20,6 +21,14 @@ Alarm.prototype = {
     this.changePwmDelayed(0, 250);
     this.changePwmDelayed(this.lowTone, 300);
     this.changePwmDelayed(0, 550);
+  },
+  errorSequence() {
+    piblaster.setPwm(this.alarmPin, this.errorTone);
+    this.changePwmDelayed(0, 250);
+    this.changePwmDelayed(this.errorTone, 300);
+    this.changePwmDelayed(0, 550);
+    this.changePwmDelayed(this.errorTone, 600);
+    this.changePwmDelayed(0, 850);
   },
   changePwmDelayed(value, delay) {
     var timedSound = function(pwm) {

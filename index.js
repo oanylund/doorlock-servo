@@ -22,7 +22,7 @@ User.sync().then(function() {
         console.log('--------------------------------------------');
         console.log('Unauthorized card: ' + rfidSerialNumber);
         console.log(new Date());
-        // FEILPIPING fra buzzer
+        AlarmBuzzer.errorSequence();
       }
       else {
         if( MainLock.IsLocked() ) {
