@@ -30,6 +30,10 @@ Alarm.prototype = {
     this.changePwmDelayed(this.errorTone, 600);
     this.changePwmDelayed(0, 850);
   },
+  verificationSequence() {
+    piblaster.setPwm(this.alarmPin, this.highTone);
+    this.changePwmDelayed(0, 500);
+  },
   changePwmDelayed(value, delay) {
     var timedSound = function(pwm) {
       piblaster.setPwm(this.alarmPin, pwm);
