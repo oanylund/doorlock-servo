@@ -17,6 +17,10 @@ var logger = function(msg) {
   console.log(new Date());
 }
 
+// Log startup, verify to user with sound
+logger('App started');
+AlarmBuzzer.verificationSequence();
+
 // TODO: Pull eventEmitter out to its own file, make an inherited event.
 rfid(function(rfidSerialNumber){
   if( newRegistration ) {
@@ -60,7 +64,7 @@ io.on('connection', function (socket) {
 
 // Handle lock/unlock door
 User.sync().then(function() {
-  logger('User schema synced.');
+  logger('User schema synced');
 
     eventEmitter.on('cardScanned', function(rfidSerialNumber) {
 
