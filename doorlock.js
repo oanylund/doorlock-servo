@@ -9,7 +9,7 @@ function Doorlock(pinUsed, openPosition, closePosition) {
   motorPower.writeSync(0);
 
   // Assign variables
-  this.pinUsed = pinUsed || 22;
+  this.pinUsed = pinUsed || 21;
   this.openPosition = openPosition || 0.096;
   this.closePosition = closePosition || 0.056;
 
