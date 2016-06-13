@@ -1,8 +1,8 @@
-var doorlock = require('./doorlock.js');
-var MainLock = new doorlock();
+var Doorlock = require('./doorlock.js');
+var mainLock = new Doorlock();
 
-var alarmBuzzer = require('./alarm.js');
-var AlarmBuzzer = new alarmBuzzer();
+var AlarmBuzzer = require('./alarm.js');
+var alarmBuzzer = new AlarmBuzzer();
 
 var User = require('doorlock-models').User;
 
@@ -23,9 +23,8 @@ var logger = function(msg) {
 }
 
 
-// Log startup, verify to user with sound
+// Log startup
 logger('App started');
-AlarmBuzzer.verificationSequence();
 
 // Socket.io stuff for getting new studentCardId to admin ui on registration
 var io = require('socket.io')(8080, { serveClient: false });
@@ -40,7 +39,7 @@ io.on('connection', function (socket) {
 
     var waitForScantimeout = setTimeout(function() {
       logger('Requester failed to scan card within timelimit');
-      AlarmBuzzer.errorSequence();
+      alarmBuzzer.errorSequence();
       response(false);
       rfidReader.setNewRegistration(false);
       socket.disconnect();
@@ -48,7 +47,7 @@ io.on('connection', function (socket) {
 
     rfidReader.once('newCardScanned', function(rfidSerialNumber) {
       logger('New card scanned, id ' + rfidSerialNumber + ' returned');
-      AlarmBuzzer.verificationSequence();
+      alarmBuzzer.verificationSequence();
       response(rfidSerialNumber);
       rfidReader.setNewRegistration(false);
       clearTimeout(waitForScantimeout);
@@ -61,6 +60,8 @@ io.on('connection', function (socket) {
 // Handle lock/unlock door
 User.sync().then(function() {
   logger('User schema synced');
+  // Sound for user to know app has started and synced db
+  alarmBuzzer.verificationSequence();
 
     rfidReader.on('cardScanned', function(rfidSerialNumber) {
 
@@ -70,18 +71,18 @@ User.sync().then(function() {
       }).then(function(user) {
         if( !user ) {
           logger('Unauthorized card: ' + rfidSerialNumber);
-          AlarmBuzzer.errorSequence();
+          alarmBuzzer.errorSequence();
         }
         else {
-          if( MainLock.IsLocked() ) {
-            MainLock.Unlock();
+          if( mainLock.IsLocked() ) {
+            mainLock.Unlock();
             logger('Door opened for user ' + user.firstName + ' ' + user.lastName);
-            AlarmBuzzer.openSequence();
+            alarmBuzzer.openSequence();
           }
           else {
-            MainLock.Lock();
+            mainLock.Lock();
             logger('Door closed for user ' + user.firstName + ' ' + user.lastName);
-            AlarmBuzzer.closeSequence();
+            alarmBuzzer.closeSequence();
           }
         }
       });
@@ -92,5 +93,5 @@ User.sync().then(function() {
 process.on('SIGINT', function () {
   console.log('\nService stopped by user. Bye');
   // Release GPIO pins used by onoff
-  MainLock.release();
+  mainLock.release();
 });
