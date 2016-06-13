@@ -1,35 +1,31 @@
 var doorlock = require('./doorlock.js');
 var MainLock = new doorlock();
 
-var EventEmitter = require("events").EventEmitter;
-var eventEmitter = new EventEmitter();
-
 var alarmBuzzer = require('./alarm.js');
 var AlarmBuzzer = new alarmBuzzer();
-var rfid = require('rc522-rfid');
+
 var User = require('doorlock-models').User;
 
-var newRegistration = false;
+var RfidReader = require('./rfid.js');
+var rfidReader = new RfidReader();
+var rfid = require('rc522-rfid');
 
+// Register cardscan event
+rfid(function(rfidSerNumber) {
+  rfidReader.cardScan(rfidSerNumber);
+});
+
+// Logger util function
 var logger = function(msg) {
   console.log('--------------------------------------------');
   console.log(msg);
   console.log(new Date());
 }
 
+
 // Log startup, verify to user with sound
 logger('App started');
 AlarmBuzzer.verificationSequence();
-
-// TODO: Pull eventEmitter out to its own file, make an inherited event.
-rfid(function(rfidSerialNumber){
-  if( newRegistration ) {
-    eventEmitter.emit('newCardScanned', rfidSerialNumber);
-  }
-  else {
-    eventEmitter.emit('cardScanned', rfidSerialNumber);
-  }
-});
 
 // Socket.io stuff for getting new studentCardId to admin ui on registration
 var io = require('socket.io')(8080, { serveClient: false });
@@ -40,21 +36,21 @@ io.on('connection', function (socket) {
   socket.on('scanNewId', function(response) {
 
     logger('Request to scan new card recieved');
-    newRegistration = true;
+    rfidReader.setNewRegistration(true);
 
     var waitForScantimeout = setTimeout(function() {
       logger('Requester failed to scan card within timelimit');
       AlarmBuzzer.errorSequence();
       response(false);
-      newRegistration = false;
+      rfidReader.setNewRegistration(false);
       socket.disconnect();
     }, 10000);
 
-    eventEmitter.once('newCardScanned', function(rfidSerialNumber) {
+    rfidReader.once('newCardScanned', function(rfidSerialNumber) {
       logger('New card scanned, id ' + rfidSerialNumber + ' returned');
       AlarmBuzzer.verificationSequence();
       response(rfidSerialNumber);
-      newRegistration = false;
+      rfidReader.setNewRegistration(false);
       clearTimeout(waitForScantimeout);
       socket.disconnect();
     });
@@ -66,7 +62,7 @@ io.on('connection', function (socket) {
 User.sync().then(function() {
   logger('User schema synced');
 
-    eventEmitter.on('cardScanned', function(rfidSerialNumber) {
+    rfidReader.on('cardScanned', function(rfidSerialNumber) {
 
       User.findOne({
         where: { studentCardId: rfidSerialNumber },
