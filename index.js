@@ -29,8 +29,10 @@ logger('App started');
 // Socket.io stuff for getting new studentCardId to admin ui on registration
 var io = require('socket.io')(8080, { serveClient: false });
 
-io.on('connection', function (socket) {
-  logger('New connection on socket 8080');
+var getId = io.of('/get-id');
+
+getId.on('connection', function (socket) {
+  logger('New connection on socket 8080, namespace /get-id');
 
   socket.on('scanNewId', function(response) {
 
