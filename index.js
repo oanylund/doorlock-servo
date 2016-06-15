@@ -72,6 +72,11 @@ auth.on('connection', socketioJwt.authorize({
 .on('authenticated', function(socket) {
   // Authenticated socket
 
+  // Emit lockstatus on socket connection
+  socket.emit('lockStatus', {
+    isLocked: mainLock.IsLocked()
+  });
+
   // Create a child process
   var logTail = spawn('tail',
       ['-f', '-n', 12, path.resolve(__dirname, '../logs/doorlock-servo-out.log')]);
@@ -144,8 +149,12 @@ User.sync().then(function() {
 // Force process exit to only listen for exit event.
 var cleanExit = function() { process.exit() };
 process.on('SIGINT', cleanExit); // catch ctrl-c
-process.on('SIGTERM', cleanExit); // catch kill
+process.on('SIGTERM', function() { // catch kill
+  logger('Terminated by parent process');
+  cleanExit();
+});
 
 process.on('exit', function() {
+  logger('App closing down');
   // All cleanup necessary on exit goes here
 });
