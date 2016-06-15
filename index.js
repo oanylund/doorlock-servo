@@ -80,8 +80,30 @@ auth.on('connection', socketioJwt.authorize({
     socket.emit('logTail', data.toString());
   });
 
+  var lockStatusCb = function(newStatus) {
+    socket.emit('lockStatus', newStatus);
+  }
+  mainLock.on('lockStatusChanged', lockStatusCb);
+
+  socket.on('forceOpen', function() {
+    if( mainLock.IsLocked() ) {
+      logger('Lock opened from admin UI');
+      mainLock.Unlock();
+      alarmBuzzer.openSequence();
+    }
+  });
+
+  socket.on('forceClose', function() {
+    if( !mainLock.IsLocked() ) {
+      logger('Lock closed from admin UI');
+      mainLock.Lock();
+      alarmBuzzer.closeSequence();
+    }
+  });
+
   socket.on('disconnect', function() {
     logTail.kill();
+    mainLock.removeListener('lockStatusChanged', lockStatusCb);
   });
 
 });
@@ -105,12 +127,12 @@ User.sync().then(function() {
         else {
           if( mainLock.IsLocked() ) {
             mainLock.Unlock();
-            logger('Door opened for user ' + user.firstName + ' ' + user.lastName);
+            logger('Lock opened for user ' + user.firstName + ' ' + user.lastName);
             alarmBuzzer.openSequence();
           }
           else {
             mainLock.Lock();
-            logger('Door closed for user ' + user.firstName + ' ' + user.lastName);
+            logger('Lock closed for user ' + user.firstName + ' ' + user.lastName);
             alarmBuzzer.closeSequence();
           }
         }
