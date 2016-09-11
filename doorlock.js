@@ -21,19 +21,19 @@ function Doorlock() {
 
 util.inherits(Doorlock, EventEmitter);
 
-Doorlock.prototype.Unlock = function() {
+Doorlock.prototype.Unlock = function(cb) {
   if( this.isLocked ) {
     piblaster.setPwm(this.pinUsed, this.openPosition);
-    this._motorPowered();
+    this._motorPowered(cb);
     this.isLocked = false;
     this._statusChange();
   }
 }
 
-Doorlock.prototype.Lock = function() {
+Doorlock.prototype.Lock = function(cb) {
   if( !this.isLocked ) {
     piblaster.setPwm(this.pinUsed, this.closePosition);
-    this._motorPowered();
+    this._motorPowered(cb);
     this.isLocked = true;
     this._statusChange();
   }
@@ -47,18 +47,25 @@ Doorlock.prototype.release = function() {
   motorPower.unexport();
 }
 
-Doorlock.prototype._motorPowered = function(duration) {
-  var dur = duration || 800;
+Doorlock.prototype._motorPowered = function(duration, cb) {
+  var dur = !isNaN(duration) ? duration : 800;
+  if(!cb && typeof duration === 'function') {
+    var cb = duration;
+  }
+
   motorPower.write(1, function(err) {
     if(err) {
       console.error(err);
       return;
     }
-    else {
-      setTimeout(function() {
-        motorPower.writeSync(0);
-      }, dur);
-    }
+
+    setTimeout(function() {
+      motorPower.writeSync(0);
+      if(typeof cb === 'function') {
+        cb();
+      }
+    }, dur);
+
   });
 }
 

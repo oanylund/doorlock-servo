@@ -90,19 +90,29 @@ auth.on('connection', socketioJwt.authorize({
   }
   mainLock.on('lockStatusChanged', lockStatusCb);
 
-  socket.on('forceOpen', function() {
+  socket.on('forceOpen', function(fn) {
     if( mainLock.IsLocked() ) {
       logger('Lock opened from admin UI');
-      mainLock.Unlock();
+      mainLock.Unlock(function() {
+        fn(true);
+      });
       alarmBuzzer.openSequence();
+    }
+    else {
+      fn(false);
     }
   });
 
-  socket.on('forceClose', function() {
+  socket.on('forceClose', function(fn) {
     if( !mainLock.IsLocked() ) {
       logger('Lock closed from admin UI');
-      mainLock.Lock();
+      mainLock.Lock(function() {
+        fn(true);
+      });
       alarmBuzzer.closeSequence();
+    }
+    else {
+      fn(false);
     }
   });
 
