@@ -9,9 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "colors": "^1.1.2",
     "doorlock-models": "oanylund/doorlock-models",
     "onoff": "^1.1.0",
     "pi-blaster.js": "sarfata/pi-blaster.js",
+    "prompt": "^1.0.0",
     "rc522-rfid": "sebastianpozoga/rc522-rfid",
     "socket.io": "^1.4.6",
     "socketio-jwt": "^4.3.4"
