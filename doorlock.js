@@ -24,18 +24,16 @@ util.inherits(Doorlock, EventEmitter);
 Doorlock.prototype.Unlock = function(cb) {
   if( this.isLocked ) {
     piblaster.setPwm(this.pinUsed, this.openPosition);
-    this._motorPowered(cb);
     this.isLocked = false;
-    this._statusChange();
+    this._motorPowered(cb);
   }
 }
 
 Doorlock.prototype.Lock = function(cb) {
   if( !this.isLocked ) {
     piblaster.setPwm(this.pinUsed, this.closePosition);
-    this._motorPowered(cb);
     this.isLocked = true;
-    this._statusChange();
+    this._motorPowered(cb);
   }
 }
 
@@ -48,6 +46,7 @@ Doorlock.prototype.release = function() {
 }
 
 Doorlock.prototype._motorPowered = function(duration, cb) {
+  var self = this;
   var dur = !isNaN(duration) ? duration : 800;
   if(!cb && typeof duration === 'function') {
     var cb = duration;
@@ -64,6 +63,7 @@ Doorlock.prototype._motorPowered = function(duration, cb) {
       if(typeof cb === 'function') {
         cb();
       }
+      self._statusChange();
     }, dur);
 
   });
