@@ -94,12 +94,16 @@ auth.on('connection', socketioJwt.authorize({
     if( mainLock.IsLocked() ) {
       logger('Lock opened from admin UI');
       mainLock.Unlock(function() {
-        fn(true);
+        if(fn && typeof fn === 'function') {
+          fn(true);
+        }
       });
       alarmBuzzer.openSequence();
     }
     else {
-      fn(false);
+      if(fn && typeof fn === 'function') {
+        fn(false);
+      }
     }
   });
 
@@ -107,12 +111,16 @@ auth.on('connection', socketioJwt.authorize({
     if( !mainLock.IsLocked() ) {
       logger('Lock closed from admin UI');
       mainLock.Lock(function() {
-        fn(true);
+        if(fn && typeof fn === 'function') {
+          fn(true);
+        }
       });
       alarmBuzzer.closeSequence();
     }
     else {
-      fn(false);
+      if(fn && typeof fn === 'function') {
+        fn(false);
+      }
     }
   });
 
