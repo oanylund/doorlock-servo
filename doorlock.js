@@ -12,8 +12,8 @@ function Doorlock() {
 
   // Assign variables
   this.pinUsed = 21;
-  this.openPosition = 0.096;
-  this.closePosition = 0.056;
+  this.openPosition = 0.0765;
+  this.closePosition = 0.1055;
 
   // Lock door on init
   this.Lock();
