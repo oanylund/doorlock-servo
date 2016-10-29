@@ -1,4 +1,4 @@
-require('dotenv').config(); // Fetch local db environment vars from .env
+require('dotenv').config({path: __dirname + '/.env'}); // Fetch local db environment vars from .env
 var spawn = require('child_process').spawn;
 var path = require('path');
 
