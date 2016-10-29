@@ -1,16 +1,18 @@
 {
   "name": "doorlock_system",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Locks and unlockes the doors of the hacker space storage cabinet",
   "main": "index.js",
   "scripts": {
-    "start": "sudo node index.js"
+    "start": "sudo node index.js",
+    "generateEnvFile": "node generateEnvFile.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "colors": "^1.1.2",
-    "doorlock-models": "oanylund/doorlock-models",
+    "doorlock-models": "oanylund/doorlock-models#v2.0.0",
+    "dotenv": "^2.0.0",
     "onoff": "^1.1.0",
     "pi-blaster.js": "sarfata/pi-blaster.js",
     "prompt": "^1.0.0",
