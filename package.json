@@ -1,11 +1,11 @@
 {
   "name": "doorlock_system",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Locks and unlockes the doors of the hacker space storage cabinet",
   "main": "index.js",
   "scripts": {
     "start": "sudo node index.js",
-    "generateEnvFile": "node generateEnvFile.js"    
+    "generateEnvFile": "node generateEnvFile.js"
   },
   "author": "",
   "license": "ISC",
