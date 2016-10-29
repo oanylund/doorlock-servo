@@ -1,6 +1,6 @@
 {
   "name": "doorlock_system",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Locks and unlockes the doors of the hacker space storage cabinet",
   "main": "index.js",
   "scripts": {
