@@ -30,6 +30,9 @@ var logger = function(msg) {
 // Log startup
 logger('App started');
 
+// Sound for user to know app has started
+alarmBuzzer.verificationSequence();
+
 // Socket.io stuff for getting new studentCardId to admin ui on registration
 var io = require('socket.io')(8080, { serveClient: false });
 var socketioJwt = require('socketio-jwt');
@@ -133,37 +136,32 @@ auth.on('connection', socketioJwt.authorize({
 });
 
 // Handle lock/unlock door
-User.sync().then(function() {
-  logger('User schema synced');
-  // Sound for user to know app has started and synced db
-  alarmBuzzer.verificationSequence();
+rfidReader.on('cardScanned', function(rfidSerialNumber) {
 
-    rfidReader.on('cardScanned', function(rfidSerialNumber) {
+  User.findOne({
+    where: { studentCardId: rfidSerialNumber },
+    attributes: ['firstName', 'lastName']
+  }).then(function(user) {
+    if( !user ) {
+      logger('Unauthorized card: ' + rfidSerialNumber);
+      alarmBuzzer.errorSequence();
+    }
+    else {
+      if( mainLock.IsLocked() ) {
+        mainLock.Unlock();
+        logger('Lock opened for user ' + user.firstName + ' ' + user.lastName);
+        alarmBuzzer.openSequence();
+      }
+      else {
+        mainLock.Lock();
+        logger('Lock closed for user ' + user.firstName + ' ' + user.lastName);
+        alarmBuzzer.closeSequence();
+      }
+    }
+  });
 
-      User.findOne({
-        where: { studentCardId: rfidSerialNumber },
-        attributes: ['firstName', 'lastName']
-      }).then(function(user) {
-        if( !user ) {
-          logger('Unauthorized card: ' + rfidSerialNumber);
-          alarmBuzzer.errorSequence();
-        }
-        else {
-          if( mainLock.IsLocked() ) {
-            mainLock.Unlock();
-            logger('Lock opened for user ' + user.firstName + ' ' + user.lastName);
-            alarmBuzzer.openSequence();
-          }
-          else {
-            mainLock.Lock();
-            logger('Lock closed for user ' + user.firstName + ' ' + user.lastName);
-            alarmBuzzer.closeSequence();
-          }
-        }
-      });
-
-    });
 });
+
 
 // Force process exit to only listen for exit event.
 var cleanExit = function() { process.exit() };
