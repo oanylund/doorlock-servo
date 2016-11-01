@@ -31,7 +31,9 @@ var logger = function(msg) {
 logger('App started');
 
 // Sound for user to know app has started
-alarmBuzzer.verificationSequence();
+setTimeout(function() {
+	alarmBuzzer.verificationSequence();
+}, 500);
 
 // Socket.io stuff for getting new studentCardId to admin ui on registration
 var io = require('socket.io')(8080, { serveClient: false });
